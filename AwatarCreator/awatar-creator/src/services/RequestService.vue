@@ -8,7 +8,10 @@
     export default {
         contextPath: global.ACC ? global.ACC.config.encodedContextPath : '/awatarCore/',
         webRequest: axios.create({
-            headers: { 'Cache-Control': 'no-cache' },
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Cache-Control': 'no-cache'
+            },
             // cache will be enabled by default
             adapter: cacheAdapterEnhancer(axios.defaults.adapter, { enabledByDefault: false})
         }),
@@ -17,6 +20,7 @@
         }),
         postRequestFormEncode: axios.create({
             headers: {
+                'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             transformRequest: function (data) {
@@ -24,7 +28,7 @@
             },
         }),
         postRequestPDF: axios.create({
-            headers: {},
+            headers: {'Access-Control-Allow-Origin': '*'},
             responseType: 'blob',
         }),
 

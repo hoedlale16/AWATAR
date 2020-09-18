@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="80px" height="80px" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Desktop-HD" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="ALU-Konfigurator-Projekt-Neue-Konfiguration-Meldungen" transform="translate(-681.000000, -643.000000)" stroke="#84BD00" stroke-width="4">
+            <g id="Group-6" transform="translate(448.000000, 599.000000)">
+                <g id="Group-2-Copy" transform="translate(235.000000, 46.000000)">
+                    <g id="Group-3" transform="translate(17.000000, 25.000000)" stroke-linecap="round">
+                        <path d="M0,10.54 L15.916021,26.456021" id="Line-2"></path>
+                        <path d="M16,0.54 L41.8419662,26.3024525" id="Line-2-Copy" transform="translate(29.000000, 13.500000) scale(-1, 1) translate(-29.000000, -13.500000) "></path>
+                    </g>
+                    <circle id="Oval" cx="38" cy="38" r="38"></circle>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
