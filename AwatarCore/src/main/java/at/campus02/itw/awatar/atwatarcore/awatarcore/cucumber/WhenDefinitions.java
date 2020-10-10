@@ -4,6 +4,8 @@ import io.cucumber.java.en.When;
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 //import org.openqa.selenium.
 //import org.openqa.selenium.WebDriver;
 
@@ -21,6 +23,7 @@ public class WhenDefinitions {
 
     @When("Open website with URL {string} ")
     public void open_website_with_url(String url) {
-        //driver.get(url);
+        WebDriver driver = new ChromeDriver();
+        driver.get(url);
     }
 }
