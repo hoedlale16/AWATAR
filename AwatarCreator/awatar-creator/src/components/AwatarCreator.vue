@@ -16,9 +16,13 @@
         </Modal>
         {{modalConfirmed}}
 
+        <div>
+            <h1>Available Step Definitions:</h1>
+            {{this.availableStepDefinitions}}
+        </div>
 
         <div>
-            <div class="btn" @click="triggerRequest()"> Click me</div>
+            <div class="btn" @click="initializeAppData()"> Load from Server</div>
             <button class="btn btn-primary" @click="openModal()" data-toggle="modal" data-target="#modalDialog" data-keyboard="true">Open modal (true)</button>
             <button class="btn btn-primary" @click="openModal2()" data-toggle="modal" data-target="#modalDialog" data-keyboard="false">Open modal (false)</button>
 
@@ -37,12 +41,13 @@
     //import InfoBox from "./InfoBox";
     import Modal from "./Modal";
 
+
     export default {
         name: "AwatarCreator",
         components: {Modal, LoadingScreen},
         data() {
             return {
-                applicationData: null,
+                availableStepDefinitions: null,
                 showLoadingScreen: false,
 
 
@@ -59,8 +64,9 @@
         },
         methods: {
             triggerRequest () {
+
                 this.showLoadingScreen = true
-                RequestService.webRequest('https://www.thetopsites.net/article/52483232.shtml')
+                RequestService.webRequest('https://www.google.at/')
                 //RequestService.webRequest(RequestService.contextPath + '/test')
                     .then(function (res) {
                         this.showLoadingScreen = false
@@ -80,6 +86,7 @@
             },
 
             openModal() {
+                //this.triggerRequest()
                 this.modalTitle="My first modal"
                 this.modalText="Das ist der Modaltext"
                 this.modalClosable=true
@@ -92,9 +99,38 @@
                 this.modalClosable=false
                 this.showModalFooter=false
 
-            }
+            },
+            initializeAppData () {
+                console.log("initializeAppData")
+                this.showLoadingScreen = true
+                RequestService.webRequest(RequestService.contextPath + 'awatar/creator/stepDefinitions')
+                    .then(function (res) {
+                    this.showLoadingScreen = false
+                    if(res.data) {
+                        this.availableStepDefinitions = res.data;
+                    }
+                }.bind(this))
+                .catch(function (error) {
+                    this.showLoadingScreen = false
+                    if (error.response) {
+                        //const data = JSON.parse(error.response.data)
+                        //console.log(data.errorMsg)
+                        console.log(error.response.data);
 
+                    }
+                    else if (error.request) {
+                        console.log(error.request);
+                    }
+                    else {
+                        console.log(error.message);
+                    }
+                }.bind(this))
+            }
+        },
+        created() {
+            this.initializeAppData()
         }
+
 
     }
 

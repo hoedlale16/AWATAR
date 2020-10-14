@@ -6,7 +6,8 @@
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
     export default {
-        contextPath: global.ACC ? global.ACC.config.encodedContextPath : '/awatarCore/',
+        //contextPath: 'http://localhost:8180/awatar',
+        contextPath: 'http://localhost/api/',
         webRequest: axios.create({
             headers: {
                 'Access-Control-Allow-Origin': '*',
