@@ -33,7 +33,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"feature\": \"Login successful?\",\n    \"scenario\": \"Log into Dashboard\",\n    \"given\": [\"Given Login page with url \\\"https://www.google.at\\\" is shown\",\"today is Sunday\"],\n    \"when\": [\"When User with username \\\"admin\\\" and password \\\"pa44w0rd\\\" log into\"],\n    \"then\":[\"Dashboard is shown\"]\n}",
+					"raw": "{\n    \"feature\": \"Login successful?\",\n    \"scenario\": \"Log into Dashboard\",\n    \"given\": [\"Login page with url \\\"https://www.google.at\\\" is shown\",\"today is Sunday\"],\n    \"when\": [\"User with username \\\"admin\\\" and password \\\"pa44w0rd\\\" log into\"],\n    \"then\":[\"Dashboard is shown\"]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
