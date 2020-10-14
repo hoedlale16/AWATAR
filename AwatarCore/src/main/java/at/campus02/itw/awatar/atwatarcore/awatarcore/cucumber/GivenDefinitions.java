@@ -8,11 +8,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 @RunWith(Cucumber.class)
-@CucumberOptions
+@CucumberOptions(publish = false)
 public class GivenDefinitions {
 
   @Given("Login page with url {string} is shown")
-  public void login_page_is_shown(String url) {
+  public void login_page_with_url_is_shown(String url) {
 
       WebDriver driver = new ChromeDriver();
       driver.get(url);

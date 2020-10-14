@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ScannedGenericBeanDefinition;
-import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
@@ -32,7 +31,7 @@ public class AwatarCreatorController {
 
     @RequestMapping(value = "/stepDefinitions", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Map<String, Object> getApplicationData() throws Exception {
+    public Map<String, Object> getApplicationData() {
 
         Map<String, Object> applicationData = new HashMap<>();
 
@@ -45,7 +44,7 @@ public class AwatarCreatorController {
 
 
         //TODO: add further avialable information (e.g. stored test cased and test scenarios)
-        applicationData.put("testScenarios", awatarCreatorFacade.getAllTestScenarios());
+        //applicationData.put("testScenarios", awatarCreatorFacade.getAllTestScenarios());
 
         return applicationData;
     }

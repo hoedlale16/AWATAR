@@ -1,8 +1,5 @@
 package at.campus02.itw.awatar.atwatarcore.awatarcore.facade;
 
-import at.campus02.itw.awatar.atwatarcore.awatarcore.dto.AwatarTestFeatureDTO;
-import at.campus02.itw.awatar.atwatarcore.awatarcore.dto.AwatarTestScenarioDTO;
-import at.campus02.itw.awatar.atwatarcore.awatarcore.dto.AwatarTestStepDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +10,7 @@ import java.util.List;
 @Service()
 @Transactional
 public class AwatarCreatorFacade {
-
+/*
     public List<AwatarTestFeatureDTO> getAllTestScenarios() {
 
         final ArrayList<AwatarTestFeatureDTO> testScenarios = new ArrayList<>();
@@ -35,4 +32,5 @@ public class AwatarCreatorFacade {
 
         return testScenarios;
     }
+ */
 }

@@ -6,12 +6,10 @@ import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-//import org.openqa.selenium.
-//import org.openqa.selenium.WebDriver;
 
 
 @RunWith(Cucumber.class)
-@CucumberOptions
+@CucumberOptions(publish = false)
 public class WhenDefinitions {
 
     //private final WebDriver driver = new ChromeDriver();
