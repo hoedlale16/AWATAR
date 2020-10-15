@@ -34,10 +34,16 @@
         </div>
 
         <div style="text-align: center;">
-            <h1>TODO: Hier entsteht der AWATAR Creator</h1>
-            <p>Ein Tool zur Erstellung von automatisierten Tests mit AWATAR</p>
+            <h1>AWATAR Creator</h1>
+            <p>Ein Tool zur Erstellung von automatisierten Tests nach Behavior Test Driven Approach mit AWATAR</p>
         </div>
 
+
+        <div class="row">
+            <div style="width: 50%; margin: 0 auto;">
+                <create-test-feature v-model="testFeature" :step-definitions="availableStepDefinitions"></create-test-feature>
+            </div>
+        </div>
 
     </div>
     <div v-else>
@@ -56,10 +62,11 @@
     import LoadingScreen from "./LoadingScreen";
     import InfoBox from "./InfoBox";
     import Modal from "./Modal";
+    import CreateTestFeature from "./CreateTestFeature";
 
     export default {
         name: "AwatarCreator",
-        components: {Modal, LoadingScreen, InfoBox},
+        components: {CreateTestFeature, Modal, LoadingScreen, InfoBox},
         data() {
             return {
                 applicationData: null,
@@ -75,7 +82,47 @@
                 modalConfirmed: null, //Returning Result of modal
 
 
-                showDevSpielwiese: false
+                showDevSpielwiese: false,
+                testFeature: {
+                    feature: null,
+                    scenario: null,
+                    given: [
+                        {
+                            "methodName": "login_page_with_url_is_shown",
+                            "stepDefinition": "Login page with url {string} is shown",
+                            "filledStepDefinition": "Login page with url 'http://www.google.at' is shown",
+                            "parameters": [
+                                "string"
+                            ]
+                        },
+                        {
+                            "methodName": "open_website_with_url",
+                            "stepDefinition": "Open website with URL {string} ",
+                            "filledStepDefinition": "Open website with URL 'http://www.google.at'",
+                            "parameters": [
+                                "string"
+                            ]
+                        },
+                        {
+                            "methodName": "open_website_with_url1",
+                            "stepDefinition": "Open website with URL {string} 1",
+                            "filledStepDefinition": "Open website with URL 'http://www.google.at' 1",
+                            "parameters": [
+                                "string"
+                            ]
+                        },
+                        {
+                            "methodName": "open_website_with_url2",
+                            "stepDefinition": "Open website with URL {string} 2",
+                            "filledStepDefinition": "Open website with URL 'http://www.google.at' 2",
+                            "parameters": [
+                                "string"
+                            ]
+                        }
+                    ],
+                    when: [],
+                    then: []
+                }
             }
         },
         watch: {

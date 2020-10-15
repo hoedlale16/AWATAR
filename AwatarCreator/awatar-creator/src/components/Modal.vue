@@ -29,9 +29,6 @@
 </template>
 
 <script>
-    //import JQuery from 'jquery'
-    //let $ = JQuery
-
     export default {
         name: 'Modal',
         props: {
@@ -50,16 +47,12 @@
                 this.$emit('input', false)
             },
             confirmModal() {
-                console.log("Modal-Method: confirmModal")
                 this.$emit('input', true)
             }
         },
         watch: {
         },
-        created() {
-        },
-        destroyed() {
-            console.log("Component Modal destroyed")
-        }
+        created() { },
+        destroyed() { }
     }
 </script>
