@@ -1,66 +1,90 @@
 <template>
-    <div>
+    <div v-if="applicationData">
         <!-- Loading Screen -->
         <template v-if="showLoadingScreen">
             <LoadingScreen msg="Please wait..."></LoadingScreen>
         </template>
 
-        <!--Exmample Info Box -->
-        <!-- <InfoBox msg="My Infobox" v-bind:closeable="true" type="error"></InfoBox>-->
+        <!--Modal dialog-->
+        <template v-if="createModal">
+            <Modal v-model="modalConfirmed"
+                   :title="modalTitle"
+                   :text="modalText"
+                   :closeable="modalClosable"
+                   :show-footer="showModalFooter">
+            </Modal>
+        </template>
 
-        <Modal v-model="modalConfirmed"
-               :title="modalTitle"
-               :text="modalText"
-               :closeable="modalClosable"
-               :show-footer="showModalFooter">
-        </Modal>
-        {{modalConfirmed}}
-
-        <div>
+        <a class="btn btn-primary pull-left" @click="showDevSpielwiese = !showDevSpielwiese">Spielwiese anzeigen</a>
+        <div class="devSpielwiese" v-if="showDevSpielwiese">
             <h1>Available Step Definitions:</h1>
-            {{this.availableStepDefinitions}}
+            <ul>
+                <li>GIVEN: {{this.availableStepDefinitions.GIVEN}}</li>
+                <li>WHEN: {{this.availableStepDefinitions.WHEN}}</li>
+                <li>THEN: {{this.availableStepDefinitions.THEN}}</li>
+            </ul>
+
+            <div style="text-align: center">
+                <div class="btn btn-primary mr-3" @click="initializeAppData()"> Reinit Application</div>
+
+                <button class="btn btn-primary mr-3" @click="openModalDialog('Modal dialog', 'This is a modal dialog', false,true)" data-toggle="modal" data-target="#modalDialog" data-backdrop="static" data-keyboard="false">Open static modal</button>
+                <button class="btn btn-primary mr-3" @click="openModalDialog('Dialog', 'This is a closable dialog', true,false)"    data-toggle="modal" data-target="#modalDialog" data-backdrop="static" data-keyboard="false">Open closable dialog</button>
+                <div class="btn btn-primary mr-3" @click="openModalDialog('Dialog', 'This is a Dialog from DIV',false,true)"        data-toggle="modal" data-target="#modalDialog" data-backdrop="static" data-keyboard="false">Div-Buton</div>
+            </div>
         </div>
 
-        <div>
-            <div class="btn" @click="initializeAppData()"> Load from Server</div>
-            <button class="btn btn-primary" @click="openModal()" data-toggle="modal" data-target="#modalDialog" data-keyboard="true">Open modal (true)</button>
-            <button class="btn btn-primary" @click="openModal2()" data-toggle="modal" data-target="#modalDialog" data-keyboard="false">Open modal (false)</button>
-
-
+        <div style="text-align: center;">
+            <h1>TODO: Hier entsteht der AWATAR Creator</h1>
+            <p>Ein Tool zur Erstellung von automatisierten Tests mit AWATAR</p>
         </div>
+
+
+    </div>
+    <div v-else>
+        <InfoBox v-if="noBackendAvailable" msg="AWATAR Backend Server not reachable" v-bind:closeable="false" type="error"></InfoBox>
     </div>
 </template>
 
 <style scoped>
-
+ .devSpielwiese {
+     background-color: grey;
+ }
 </style>
 
 <script>
     import RequestService from "../services/RequestService";
     import LoadingScreen from "./LoadingScreen";
-    //import InfoBox from "./InfoBox";
+    import InfoBox from "./InfoBox";
     import Modal from "./Modal";
-
 
     export default {
         name: "AwatarCreator",
-        components: {Modal, LoadingScreen},
+        components: {Modal, LoadingScreen, InfoBox},
         data() {
             return {
+                applicationData: null,
+                noBackendAvailable: false,
                 availableStepDefinitions: null,
                 showLoadingScreen: false,
 
 
+                createModal: false, //Flag to create new modal dialog
                 modalTitle: '',
                 modalText: '',
-                modalClosable: true,
                 showModalFooter: false,
-                modalConfirmed:false, //Returning Result of modal
+                modalConfirmed: null, //Returning Result of modal
 
+
+                showDevSpielwiese: false
             }
         },
         watch: {
-
+            modalConfirmed(newVal) {
+                if(newVal) {
+                    console.log("modalConfirmed by User")
+                    this.createModal = false //Destroy currently modal
+                }
+            }
         },
         methods: {
             triggerRequest () {
@@ -85,29 +109,29 @@
 
             },
 
-            openModal() {
-                //this.triggerRequest()
-                this.modalTitle="My first modal"
-                this.modalText="Das ist der Modaltext"
-                this.modalClosable=true
-                this.showModalFooter=true
-            },
+             openModalDialog(title, text, closable,showModalFooter) {
+                this.modalTitle=title
+                this.modalText=text
+                this.modalClosable=closable
+                this.showModalFooter=showModalFooter
 
-            openModal2() {
-                this.modalTitle="asdfasdf"
-                this.modalText="asdasdasdasdas"
-                this.modalClosable=false
-                this.showModalFooter=false
+                 //Create new Modal and reset previous confirm result
+                this.createModal = true
+                this.modalConfirmed = null
 
             },
             initializeAppData () {
                 console.log("initializeAppData")
+
                 this.showLoadingScreen = true
-                RequestService.webRequest(RequestService.contextPath + 'awatar/creator/stepDefinitions')
-                    .then(function (res) {
+                RequestService.webRequest(RequestService.contextPath + '/creator/stepDefinitions')
+                .then(function (res) {
                     this.showLoadingScreen = false
-                    if(res.data) {
-                        this.availableStepDefinitions = res.data;
+                    this.applicationData = res.data
+                    if(this.applicationData) {
+                        this.availableStepDefinitions = (this.applicationData.stepDefinition) ? this.applicationData.stepDefinition : []
+                    } else {
+                        this.noBackendAvailable = true
                     }
                 }.bind(this))
                 .catch(function (error) {
