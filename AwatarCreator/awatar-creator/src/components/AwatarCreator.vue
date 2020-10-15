@@ -87,28 +87,6 @@
             }
         },
         methods: {
-            triggerRequest () {
-
-                this.showLoadingScreen = true
-                RequestService.webRequest('https://www.google.at/')
-                //RequestService.webRequest(RequestService.contextPath + '/test')
-                    .then(function (res) {
-                        this.showLoadingScreen = false
-                        console.log(res)
-                    }.bind(this))
-                    .catch(function (reason) {
-                        this.showLoadingScreen = false
-                        if (reason.response) {
-                            const data = JSON.parse(reason.response.data)
-                            console.log(data.errorMsg)
-                            //UtilService.showError(data.errorMsg)
-                        } else {
-                            console.log(reason)
-                        }
-                    }.bind(this))
-
-            },
-
              openModalDialog(title, text, closable,showModalFooter) {
                 this.modalTitle=title
                 this.modalText=text
@@ -121,8 +99,6 @@
 
             },
             initializeAppData () {
-                console.log("initializeAppData")
-
                 this.showLoadingScreen = true
                 RequestService.webRequest(RequestService.contextPath + '/creator/stepDefinitions')
                 .then(function (res) {
@@ -137,10 +113,8 @@
                 .catch(function (error) {
                     this.showLoadingScreen = false
                     if (error.response) {
-                        //const data = JSON.parse(error.response.data)
-                        //console.log(data.errorMsg)
-                        console.log(error.response.data);
-
+                        const data = JSON.parse(error.response.data)
+                        console.log(data.errorMsg)
                     }
                     else if (error.request) {
                         console.log(error.request);
@@ -154,8 +128,6 @@
         created() {
             this.initializeAppData()
         }
-
-
     }
 
 
