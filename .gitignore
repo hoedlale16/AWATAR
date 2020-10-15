@@ -261,4 +261,8 @@ dist/
 npm-debug.log
 yarn-error.log
 
+
+/AwatarCreator/.DS_Store
+.DS_Store
+
 # End of https://www.toptal.com/developers/gitignore/api/java,java-web,maven,intellij,node,vuejs
