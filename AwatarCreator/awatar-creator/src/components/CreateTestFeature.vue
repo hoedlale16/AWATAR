@@ -14,7 +14,7 @@
                 <!-- Modal body -->
                 <div class="modal-body">
                     <div class="form-group">
-                        <select v-model="addNewStepDefinitionModalSelectedObject" class="form-control" style="margin-bottom: 10px ">
+                        <select v-model="addNewStepDefinitionModalSelectedObject.stepDefinition" class="form-control" style="margin-bottom: 10px">
                             <option disabled="disabled" :value="null">Verfügbaren Schritt wählen</option>
                             <option v-for="(sd) in addNewStepDefinitionModalAvailableStepDefinitions" :key="sd.stepDefinition" :value="sd">
                                 {{sd.stepDefinition}}
@@ -23,14 +23,15 @@
 
 
                         <!-- Dynamic parameter fields -->
-                        <div v-if="addNewStepDefinitionModalSelectedObject">
-                            <div class="input-group mb-3" v-for="(param, index) in addNewStepDefinitionModalSelectedObject.parameters" :key="index">
+                        <div v-if="addNewStepDefinitionModalSelectedObject.stepDefinition">
+                            <div class="input-group mb-3" v-for="(param, index) in addNewStepDefinitionModalSelectedObject.stepDefinition.parameters" :key="index">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text"> <span>Parameter {{index +1 }}</span></div>
                                 </div>
 
-                                <!--TODO: Bind parameters https://vuejs.org/v2/guide/list.html -->
-                                <input type="text" class="form-control"  :placeholder="param" autocomplete="off">
+                                <input type="text" class="form-control"
+                                       :placeholder="addNewStepDefinitionModalSelectedObject.stepDefinition.parameters[index]"
+                                       v-model="addNewStepDefinitionModalSelectedObject.parameterValues[index]">
                             </div>
                         </div>
                     </div>
@@ -41,7 +42,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-danger" data-dismiss="modal" @click="cancelStepDefinitionModal">Abort</button>
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal"
-                            @click="addNewStepDefinitionModal" :disabled="! addNewStepDefinitionModalSelectedObject">Confirm</button>
+                            @click="addNewStepDefinitionModal" :disabled="! validAddNewStepDefinitionModalSelectedObject">Confirm</button>
                 </div>
             </div>
         </div>
@@ -111,8 +112,8 @@
 
                 <!--List of Step definitions -->
                 <ul class="list-group" :class="{'ul-testFeature-actions' : testFeature.given && testFeature.given.length > 0} ">
-                    <li style="margin-left: 1em;" class="list-group-item d-flex justify-content-between align-items-center" v-for="(given, index) in testFeature.given" :key="given.stepDefinition" :value="given">
-                        {{given.filledStepDefinition}}
+                    <li style="margin-left: 1em;" class="list-group-item d-flex justify-content-between align-items-center" v-for="(given, index) in testFeature.given" :key="given.filledStepDefinition" :value="given">
+                        <span v-html="given.formattedFilledStepDefinition"></span>
                         <a href="#"  class="badge badge-secondary badge-pill" @click="removeStepDefinition(testFeature.given, index)">&times;</a>
                     </li>
                 </ul>
@@ -156,9 +157,9 @@
 
                 <!--List of Step definitions -->
                 <ul class="list-group" :class="{'ul-testFeature-actions' : testFeature.when && testFeature.when.length > 0} ">
-                    <li style="margin-left: 1em;" class="list-group-item d-flex justify-content-between align-items-center" v-for="(when, index) in testFeature.when" :key="when.stepDefinition" :value="when">
-                        {{when.filledStepDefinition}}
-                        <a href="#"  class="badge badge-secondary badge-pill" @click="removeStepDefinition(testFeature.given, index)">&times;</a>
+                    <li style="margin-left: 1em;" class="list-group-item d-flex justify-content-between align-items-center" v-for="(when, index) in testFeature.when" :key="when.filledStepDefinition" :value="when">
+                        <span v-html="when.formattedFilledStepDefinition"></span>
+                        <a href="#"  class="badge badge-secondary badge-pill" @click="removeStepDefinition(testFeature.when, index)">&times;</a>
                     </li>
                 </ul>
 
@@ -200,9 +201,9 @@
 
                 <!--List of Step definitions -->
                 <ul class="list-group" :class="{'ul-testFeature-actions' : testFeature.then && testFeature.then.length > 0} ">
-                    <li style="margin-left: 1em;" class="list-group-item d-flex justify-content-between align-items-center" v-for="(then, index) in testFeature.then" :key="then.stepDefinition" :value="then">
-                        {{then.filledStepDefinition}}
-                        <a href="#"  class="badge badge-secondary badge-pill" @click="removeStepDefinition(testFeature.given, index)">&times;</a>
+                    <li style="margin-left: 1em;" class="list-group-item d-flex justify-content-between align-items-center" v-for="(then, index) in testFeature.then" :key="then.filledStepDefinition" :value="then">
+                        <span v-html="then.formattedFilledStepDefinition"></span>
+                        <a href="#"  class="badge badge-secondary badge-pill" @click="removeStepDefinition(testFeature.then, index)">&times;</a>
                     </li>
                 </ul>
 
@@ -226,7 +227,8 @@
     </div>
 
     <div class="form-group">
-        <a class="btn btn-primary float-right" :class="{'disabled' : ! validTestFeature}" @click="executeTest()">Test ausführen</a>
+        <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="executeTest()">Test ausführen</a>
+        <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="saveAsFile()">Testfall speichern</a>
     </div>
 
 
@@ -278,13 +280,35 @@
                         (this.testFeature.given && this.testFeature.given.length >0) &&
                         (this.testFeature.when && this.testFeature.when.length >0) &&
                         (this.testFeature.then && this.testFeature.then.length >0)) ? true : false
+            },
+            validAddNewStepDefinitionModalSelectedObject() {
+                if (this.addNewStepDefinitionModalSelectedObject ) {
+                    let selectedStepDefinition = this.addNewStepDefinitionModalSelectedObject.stepDefinition
+                    let parameterValues = this.addNewStepDefinitionModalSelectedObject.parameterValues
+                    let parameterValueLength = 0;
+
+                    //Ignore empty parameter fields...
+                    if(parameterValues) {
+                        parameterValues.forEach(function (param) {
+                            if(param) {
+                                parameterValueLength++ }
+                        })
+                    }
+
+                    if(selectedStepDefinition && parameterValues) {
+                        if (selectedStepDefinition.stepDefinition &&
+                            selectedStepDefinition.parameters.length == parameterValueLength) {
+                            return true
+                        }
+                    }
+                }
+                return false;
             }
         },
         methods: {
             initialize() {
                 this.testFeature = this.value
             },
-
 
             removeStepDefinition: function(stepDefintions, index) {
                 this.$delete(stepDefintions, index);
@@ -293,12 +317,15 @@
             showAddNewStepDefinitionModal(title, action) {
                 this.addNewStepDefinitionModalTitle = title
                 this.addNewStepDefinitionModalAction = action
-                this.addNewStepDefinitionModalSelectedObject = null
+                this.addNewStepDefinitionModalSelectedObject = {
+                    stepDefinition: {},
+                    parameterValues: []
+                }
+
+                //Set selectable step definitions
                 this.addNewStepDefinitionModalAvailableStepDefinitions =
                     this.stepDefinitions[this.addNewStepDefinitionModalAction]
 
-
-                console.log(this.addNewStepDefinitionModalAvailableStepDefinitions)
                 //Show dialog
                 this.addNewStepDefinitionModalShow = true;
             },
@@ -313,27 +340,19 @@
 
             addNewStepDefinitionModal: function()  {
                 if(this.addNewStepDefinitionModalSelectedObject) {
-                    console.log("addNewStepDefinitionModal")
 
-                    this.addNewStepDefinitionModalSelectedObject.filledStepDefinition = this.addNewStepDefinitionModalSelectedObject.stepDefinition
+                    //Build filled Step definition (selected step definiton with given parameter values)
+                    let selectedStepDefinition = this.addNewStepDefinitionModalSelectedObject.stepDefinition.stepDefinition
+                    let parameterValues = this.addNewStepDefinitionModalSelectedObject.parameterValues
+                    let stepDefinition = this.buildStepDefinition(selectedStepDefinition, parameterValues)
 
-                    switch (this.addNewStepDefinitionModalAction)
-                    {
-                        case "GIVEN": {
-                            this.testFeature.given.push(this.addNewStepDefinitionModalSelectedObject)
-                            break;
-                        }
-                        case "WHEN": {
-                            this.testFeature.when.push(this.addNewStepDefinitionModalSelectedObject)
-                            break;
-                        }
-                        case "THEN": {
-                            this.testFeature.then.push(this.addNewStepDefinitionModalSelectedObject)
-                            break;
-                        }
+                    //Add new step definition
+                    switch (this.addNewStepDefinitionModalAction) {
+                        case "GIVEN": { this.testFeature.given.push(stepDefinition); break; }
+                        case "WHEN":  { this.testFeature.when.push(stepDefinition);  break; }
+                        case "THEN":  { this.testFeature.then.push(stepDefinition);  break; }
                         default: { console.log("STEP DEFINITON ACTION NOT SUPPORTED!"); }
                     }
-
 
 
                     //Reset Modal
@@ -342,9 +361,83 @@
                 }
             },
 
+            buildStepDefinition(stepDefinition, parameterValues) {
+                const words = stepDefinition.split(' ');
+
+                let filledStepDefinition = ''
+                let formattedFilledStepDefinition = ''
+
+                let parameterValIndex = 0;
+                let handleParameterVal = false
+                words.forEach(function (word) {
+                    let wordToAdd = word
+                    if(wordToAdd.startsWith("{") && wordToAdd.endsWith("}")) {
+                        if(parameterValues[parameterValIndex]) {
+                            handleParameterVal=true
+                            wordToAdd = parameterValues[parameterValIndex]
+                            parameterValIndex++
+                        }
+                    }
+                    filledStepDefinition = filledStepDefinition + wordToAdd + " "
+                    if(handleParameterVal) {
+                        formattedFilledStepDefinition = formattedFilledStepDefinition + '<strong>' + wordToAdd + '</strong>' + " "
+                    } else {
+                        formattedFilledStepDefinition = formattedFilledStepDefinition + wordToAdd + " "
+                    }
+
+                    handleParameterVal = false
+
+                })
+
+                //Trim last ' '
+                filledStepDefinition = filledStepDefinition.substring(0, filledStepDefinition.length - 1);
+                formattedFilledStepDefinition = formattedFilledStepDefinition.substring(0, formattedFilledStepDefinition.length - 1);
+
+                return {
+                    filledstepDefinition: filledStepDefinition,
+                    formattedFilledStepDefinition: formattedFilledStepDefinition
+                };
+            },
+
+            saveAsFile() {
+                if(this.testFeature) {
+                    var fileLink = document.createElement('a')
+
+                    //Generate Gherkin file Format for cucumber
+                    var data = [];
+                    data.push("Feature: " + this.testFeature.feature)
+                    data.push("Scenario: " + this.testFeature.scenario)
+                    data.push(this.formatStepDefinitions(this.testFeature.given, 'Given'))
+                    data.push(this.formatStepDefinitions(this.testFeature.when, 'When'))
+                    data.push(this.formatStepDefinitions(this.testFeature.then, 'Then'))
+                    data = data.join("\n")
+
+                    //Trigger File-Download
+                    fileLink.href = window.URL.createObjectURL(new Blob([data], {type: 'text/plain'}))
+                    fileLink.setAttribute('download', this.testFeature.feature + ".feature")
+                    document.body.appendChild(fileLink)
+                    fileLink.click()
+                    fileLink.parentNode.removeChild(fileLink)
+                }
+            },
+
+            formatStepDefinitions(stepDefinitions, identifier) {
+                let formattedStepDefinition = []
+                if(stepDefinitions) {
+                    stepDefinitions.forEach( function(sd, index) {
+                        let lineStr = ((index >0 ) ? 'And' : identifier) + ' ' + sd.filledstepDefinition
+                        formattedStepDefinition.push(lineStr);
+                    })
+                }
+                return formattedStepDefinition.join("\n")
+            },
+
             executeTest() {
 
-            }
+            },
+
+
+
         },
         created() {
             this.initialize()

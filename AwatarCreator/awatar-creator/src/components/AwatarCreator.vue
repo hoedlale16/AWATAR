@@ -15,7 +15,7 @@
             </Modal>
         </template>
 
-        <a class="btn btn-primary pull-left" @click="showDevSpielwiese = !showDevSpielwiese">Spielwiese anzeigen</a>
+        <!-- <a class="btn btn-primary pull-left" @click="showDevSpielwiese = !showDevSpielwiese">Spielwiese anzeigen</a> -->
         <div class="devSpielwiese" v-if="showDevSpielwiese">
             <h1>Available Step Definitions:</h1>
             <ul>
@@ -84,42 +84,9 @@
 
                 showDevSpielwiese: false,
                 testFeature: {
-                    feature: null,
-                    scenario: null,
-                    given: [
-                        {
-                            "methodName": "login_page_with_url_is_shown",
-                            "stepDefinition": "Login page with url {string} is shown",
-                            "filledStepDefinition": "Login page with url 'http://www.google.at' is shown",
-                            "parameters": [
-                                "string"
-                            ]
-                        },
-                        {
-                            "methodName": "open_website_with_url",
-                            "stepDefinition": "Open website with URL {string} ",
-                            "filledStepDefinition": "Open website with URL 'http://www.google.at'",
-                            "parameters": [
-                                "string"
-                            ]
-                        },
-                        {
-                            "methodName": "open_website_with_url1",
-                            "stepDefinition": "Open website with URL {string} 1",
-                            "filledStepDefinition": "Open website with URL 'http://www.google.at' 1",
-                            "parameters": [
-                                "string"
-                            ]
-                        },
-                        {
-                            "methodName": "open_website_with_url2",
-                            "stepDefinition": "Open website with URL {string} 2",
-                            "filledStepDefinition": "Open website with URL 'http://www.google.at' 2",
-                            "parameters": [
-                                "string"
-                            ]
-                        }
-                    ],
+                    feature: 'feature',
+                    scenario: 'scenario',
+                    given: [],
                     when: [],
                     then: []
                 }
