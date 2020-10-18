@@ -30,7 +30,7 @@ public class AwatarRunnerController {
 
             //Execute cucumber with given file...
             executeCucumber(executionDTO, featureFile);
-            return (executionDTO.getExitState() != 0) ? new ResponseEntity(executionDTO, HttpStatus.BAD_REQUEST) : new ResponseEntity(executionDTO, HttpStatus.OK);
+            return (executionDTO.getExitState() != 0) ? new ResponseEntity(executionDTO, HttpStatus.OK) : new ResponseEntity(executionDTO, HttpStatus.OK);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,25 +1,7 @@
 <template>
     <div v-if="applicationData">
-        <!-- Loading Screen -->
-        <template v-if="showLoadingScreen">
-            <LoadingScreen msg="Please wait..."></LoadingScreen>
-        </template>
 
-        <template v-if="showInfoBox">
-            <InfoBox v-if="showInfoBox" :msg="infoBox.msg" v-bind:closeable="infoBox.closable" :type="infoBox.type"></InfoBox>
-        </template>
-
-        <!--Modal dialog-->
-        <template v-if="createModal">
-            <Modal v-model="modalConfirmed"
-                   :title="modalTitle"
-                   :text="modalText"
-                   :closeable="modalClosable"
-                   :show-footer="showModalFooter">
-            </Modal>
-        </template>
-        {{testFeature}}
-
+        <!-- ========= SPIELWIESE  =========== -->
         <!-- <a class="btn btn-primary pull-left" @click="showDevSpielwiese = !showDevSpielwiese">Spielwiese anzeigen</a> -->
         <div class="devSpielwiese" v-if="showDevSpielwiese">
             <h1>Available Step Definitions:</h1>
@@ -37,6 +19,35 @@
                 <div class="btn btn-primary mr-3" @click="openModalDialog('Dialog', 'This is a Dialog from DIV',false,true)"        data-toggle="modal" data-target="#modalDialog" data-backdrop="static" data-keyboard="false">Div-Buton</div>
             </div>
         </div>
+        <!-- ENDE SPIELWIESE -->
+
+        <!-- Loading Screen -->
+        <template v-if="showLoadingScreen">
+            <LoadingScreen msg="Please wait..."></LoadingScreen>
+        </template>
+
+        <!--Info Box-->
+        <template v-if="showInfoBox">
+            <InfoBox :msg="infoBox.msg" v-bind:closeable="infoBox.closable" :type="infoBox.type"></InfoBox>
+        </template>
+
+        <!--Modal dialog-->
+        <template v-if="createModal">
+            <Modal v-model="modalConfirmed"
+                   :title="modalTitle"
+                   :text="modalText"
+                   :closeable="modalClosable"
+                   :show-footer="showModalFooter">
+            </Modal>
+        </template>
+
+        <!-- Load test case -->
+        <template v-if="createLoadTestFeatureModal">
+            <load-test-feature v-model="loadedTestFeature"></load-test-feature>
+        </template>
+
+
+
 
         <div style="text-align: center;">
             <h1>AWATAR Creator</h1>
@@ -54,9 +65,16 @@
             <div class="form-group" style="width: 50%; margin: 0 auto;">
                 <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="executeTest()">Test ausführen</a>
                 <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="saveAsFile()">Testfall speichern</a>
-                <v-fi
+                <a class="btn btn-primary float-right mr-3" @click="showLoadTestFeature()"
+                   data-toggle="modal" data-target="#loadTestFeatureDialog" data-backdrop="static" data-keyboard="false">Testfall laden</a>
             </div>
         </div>
+
+
+        <!--Test execution log -->
+        <template v-if="showTestExecutionInfoBox">
+                <test-execution-result :type="infoBox.type" :result-log="infoBox.msg"></test-execution-result>
+        </template>
 
     </div>
     <div v-else>
@@ -76,10 +94,13 @@
     import InfoBox from "./InfoBox";
     import Modal from "./Modal";
     import CreateTestFeature from "./CreateTestFeature";
+    import LoadTestFeature from "./LoadTestFeature";
+    import TestExecutionResult from "./TestExecutionResult";
+
 
     export default {
         name: "AwatarCreator",
-        components: {CreateTestFeature, Modal, LoadingScreen, InfoBox},
+        components: {TestExecutionResult, LoadTestFeature, CreateTestFeature, Modal, LoadingScreen, InfoBox},
         data() {
             return {
                 applicationData: null,
@@ -87,6 +108,7 @@
                 availableStepDefinitions: null,
                 showLoadingScreen: false,
 
+                showTestExecutionInfoBox: false,
                 showInfoBox:false,
                 infoBox: {
                     msg: '???',
@@ -103,12 +125,16 @@
 
                 showDevSpielwiese: false,
                 testFeature: {
-                    feature: 'feature',
-                    scenario: 'scenario',
+                    feature: null,
+                    scenario: null,
                     given: [],
                     when: [],
                     then: []
-                }
+                },
+
+
+                createLoadTestFeatureModal: false,
+                loadedTestFeature: null,
             }
         },
         computed: {
@@ -124,8 +150,13 @@
         watch: {
             modalConfirmed(newVal) {
                 if(newVal) {
-                    console.log("modalConfirmed by User")
                     this.createModal = false //Destroy currently modal
+                }
+            },
+            loadedTestFeature(newVal) {
+                if(newVal) {
+                    this.testFeature = this.loadedTestFeature
+                    this.createLoadTestFeatureModal = false
                 }
             }
         },
@@ -140,6 +171,10 @@
                 this.createModal = true
                 this.modalConfirmed = null
 
+            },
+
+            showLoadTestFeature() {
+              this.createLoadTestFeatureModal = true
             },
 
             saveAsFile() {
@@ -207,6 +242,16 @@
                 RequestService.postRequest.post(RequestService.contextPath + '/runner/execute',executeTestFeature)
                     .then(function (res) {
                         console.log(res)
+                        var respone = res.data
+                        if(respone) {
+                            this.infoBox = {
+                                msg: respone.result,
+                                closable: true,
+                                type: (respone.exitState == 0) ? 'success' : 'error'
+                            }
+                            this.showTestExecutionInfoBox = true
+
+                        }
                         this.showLoadingScreen = false
                     }.bind(this))
                     .catch(function (error) {

@@ -14,7 +14,7 @@
                 <!-- Modal body -->
                 <div class="modal-body">
                     <div class="form-group">
-                        <select v-model="addNewStepDefinitionModalSelectedObject.stepDefinition" class="form-control" style="margin-bottom: 10px">
+                        <select v-model="addNewStepDefinitionModalSelectedObject.stepDefinition" class="form-control" style="margin-bottom: 10px; appearance: auto">
                             <option disabled="disabled" :value="null">Verfügbaren Schritt wählen</option>
                             <option v-for="(sd) in addNewStepDefinitionModalAvailableStepDefinitions" :key="sd.stepDefinition" :value="sd">
                                 {{sd.stepDefinition}}
@@ -267,6 +267,14 @@
                 addNewStepDefinitionModalAvailableStepDefinitions: [],
                 addNewStepDefinitionModalAction: '',
                 addNewStepDefinitionModalSelectedObject: null,
+            }
+        },
+        watch: {
+            testFeature () {
+                this.$emit('input', this.testFeature)
+            },
+            value() {
+                this.initialize()
             }
         },
         computed: {
