@@ -5,6 +5,10 @@
             <LoadingScreen msg="Please wait..."></LoadingScreen>
         </template>
 
+        <template v-if="showInfoBox">
+            <InfoBox v-if="showInfoBox" :msg="infoBox.msg" v-bind:closeable="infoBox.closable" :type="infoBox.type"></InfoBox>
+        </template>
+
         <!--Modal dialog-->
         <template v-if="createModal">
             <Modal v-model="modalConfirmed"
@@ -14,6 +18,7 @@
                    :show-footer="showModalFooter">
             </Modal>
         </template>
+        {{testFeature}}
 
         <!-- <a class="btn btn-primary pull-left" @click="showDevSpielwiese = !showDevSpielwiese">Spielwiese anzeigen</a> -->
         <div class="devSpielwiese" v-if="showDevSpielwiese">
@@ -42,6 +47,14 @@
         <div class="row">
             <div style="width: 50%; margin: 0 auto;">
                 <create-test-feature v-model="testFeature" :step-definitions="availableStepDefinitions"></create-test-feature>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group" style="width: 50%; margin: 0 auto;">
+                <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="executeTest()">Test ausführen</a>
+                <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="saveAsFile()">Testfall speichern</a>
+                <v-fi
             </div>
         </div>
 
@@ -74,6 +87,12 @@
                 availableStepDefinitions: null,
                 showLoadingScreen: false,
 
+                showInfoBox:false,
+                infoBox: {
+                    msg: '???',
+                    closable: false,
+                    type:'error',
+                },
 
                 createModal: false, //Flag to create new modal dialog
                 modalTitle: '',
@@ -91,6 +110,16 @@
                     then: []
                 }
             }
+        },
+        computed: {
+            validTestFeature() {
+                return (this.testFeature &&
+                    this.testFeature.feature &&
+                    this.testFeature.scenario &&
+                    (this.testFeature.given && this.testFeature.given.length > 0) &&
+                    (this.testFeature.when && this.testFeature.when.length > 0) &&
+                    (this.testFeature.then && this.testFeature.then.length > 0)) ? true : false
+            },
         },
         watch: {
             modalConfirmed(newVal) {
@@ -112,6 +141,90 @@
                 this.modalConfirmed = null
 
             },
+
+            saveAsFile() {
+                if(this.testFeature) {
+                    this.showLoadingScreen = true
+
+                    var fileLink = document.createElement('a')
+
+                    //Generate Gherkin file Format for cucumber
+                    var data = [];
+                    data.push("Feature: " + this.testFeature.feature)
+                    data.push("Scenario: " + this.testFeature.scenario)
+                    data.push(this.formatStepDefinitions(this.testFeature.given, 'Given'))
+                    data.push(this.formatStepDefinitions(this.testFeature.when, 'When'))
+                    data.push(this.formatStepDefinitions(this.testFeature.then, 'Then'))
+                    data = data.join("\n")
+
+                    //Trigger File-Download
+                    let fileName = this.testFeature.feature + ".feature"
+                    fileLink.href = window.URL.createObjectURL(new Blob([data], {type: 'text/plain'}))
+                    fileLink.setAttribute('download', fileName)
+                    document.body.appendChild(fileLink)
+                    fileLink.click()
+                    fileLink.parentNode.removeChild(fileLink)
+
+                    this.showLoadingScreen = false
+                    this.infoBox = {
+                        msg: "Testfall unter Filename <" + fileName + "> erfolgreich gespeichert!",
+                        closable: true,
+                        type: 'success'
+                    }
+                    this.showInfoBox = true
+
+                }
+            },
+
+            formatStepDefinitions(stepDefinitions, identifier) {
+                let formattedStepDefinition = []
+                if(stepDefinitions) {
+                    stepDefinitions.forEach( function(sd, index) {
+                        let lineStr = ((index >0 ) ? 'And' : identifier) + ' ' + sd.filledstepDefinition
+                        formattedStepDefinition.push(lineStr);
+                    })
+                }
+                return formattedStepDefinition.join("\n")
+            },
+
+            executeTest() {
+                this.showLoadingScreen = true
+
+                let executeTestFeature = new Object({
+                    feature: this.testFeature.feature,
+                    scenario: this.testFeature.scenario,
+                    given: [],
+                    when: [],
+                    then: []
+                });
+
+                this.testFeature.given.forEach(function (sd) { executeTestFeature.given.push(sd.filledstepDefinition)})
+                this.testFeature.when.forEach(function (sd) { executeTestFeature.when.push(sd.filledstepDefinition)})
+                this.testFeature.then.forEach(function (sd) { executeTestFeature.then.push(sd.filledstepDefinition)})
+
+                console.log(executeTestFeature)
+
+                RequestService.postRequest.post(RequestService.contextPath + '/runner/execute',executeTestFeature)
+                    .then(function (res) {
+                        console.log(res)
+                        this.showLoadingScreen = false
+                    }.bind(this))
+                    .catch(function (error) {
+                        this.showLoadingScreen = false
+                        if (error.response) {
+                            console.log(error.response.data.result)
+                            //const data = JSON.parse(error.response.data)
+                        }
+                        else if (error.request) {
+                            console.log(error.request);
+                        }
+                        else {
+                            console.log(error.message);
+                        }
+                    }.bind(this))
+            },
+
+
             initializeAppData () {
                 this.showLoadingScreen = true
                 RequestService.webRequest(RequestService.contextPath + '/creator/stepDefinitions')

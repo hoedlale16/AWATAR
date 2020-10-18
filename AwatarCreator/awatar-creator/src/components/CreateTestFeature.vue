@@ -226,10 +226,7 @@
 
     </div>
 
-    <div class="form-group">
-        <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="executeTest()">Test ausführen</a>
-        <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="saveAsFile()">Testfall speichern</a>
-    </div>
+
 
 
   </div>
@@ -273,14 +270,6 @@
             }
         },
         computed: {
-            validTestFeature() {
-                return (this.testFeature &&
-                        this.testFeature.feature &&
-                        this.testFeature.scenario &&
-                        (this.testFeature.given && this.testFeature.given.length >0) &&
-                        (this.testFeature.when && this.testFeature.when.length >0) &&
-                        (this.testFeature.then && this.testFeature.then.length >0)) ? true : false
-            },
             validAddNewStepDefinitionModalSelectedObject() {
                 if (this.addNewStepDefinitionModalSelectedObject ) {
                     let selectedStepDefinition = this.addNewStepDefinitionModalSelectedObject.stepDefinition
@@ -398,46 +387,6 @@
                     formattedFilledStepDefinition: formattedFilledStepDefinition
                 };
             },
-
-            saveAsFile() {
-                if(this.testFeature) {
-                    var fileLink = document.createElement('a')
-
-                    //Generate Gherkin file Format for cucumber
-                    var data = [];
-                    data.push("Feature: " + this.testFeature.feature)
-                    data.push("Scenario: " + this.testFeature.scenario)
-                    data.push(this.formatStepDefinitions(this.testFeature.given, 'Given'))
-                    data.push(this.formatStepDefinitions(this.testFeature.when, 'When'))
-                    data.push(this.formatStepDefinitions(this.testFeature.then, 'Then'))
-                    data = data.join("\n")
-
-                    //Trigger File-Download
-                    fileLink.href = window.URL.createObjectURL(new Blob([data], {type: 'text/plain'}))
-                    fileLink.setAttribute('download', this.testFeature.feature + ".feature")
-                    document.body.appendChild(fileLink)
-                    fileLink.click()
-                    fileLink.parentNode.removeChild(fileLink)
-                }
-            },
-
-            formatStepDefinitions(stepDefinitions, identifier) {
-                let formattedStepDefinition = []
-                if(stepDefinitions) {
-                    stepDefinitions.forEach( function(sd, index) {
-                        let lineStr = ((index >0 ) ? 'And' : identifier) + ' ' + sd.filledstepDefinition
-                        formattedStepDefinition.push(lineStr);
-                    })
-                }
-                return formattedStepDefinition.join("\n")
-            },
-
-            executeTest() {
-
-            },
-
-
-
         },
         created() {
             this.initialize()
