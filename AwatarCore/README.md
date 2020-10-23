@@ -19,7 +19,12 @@ After installation of all required applications you can import the Project in ID
 - Open IntelligJ
 - File -> Open -> Select AwatarCore directory -> OK (if requested open in new window)
 
-Run Project in IDE by starting ```Start Spring Boot REST Application``
+### Server Start
+Run Project in IDE by starting ```Start Spring Boot REST Application```
+The Projekt uses ports ```4000-4005```
+  - Awatar-Core: 4000
+  - Awatar-Creator: 4001
+  - Awatar-Runner: 4002
 
 ## REST Interface
 A working POSTMAN-Collection is stored under: ```\AwatarCore\resources\AWATAR.postman_collection.json```

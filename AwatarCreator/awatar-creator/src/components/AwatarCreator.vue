@@ -1,85 +1,57 @@
 <template>
-    <div v-if="applicationData">
+  <div>
 
-        <!-- ========= SPIELWIESE  =========== -->
-        <!-- <a class="btn btn-primary pull-left" @click="showDevSpielwiese = !showDevSpielwiese">Spielwiese anzeigen</a> -->
-        <div class="devSpielwiese" v-if="showDevSpielwiese">
-            <h1>Available Step Definitions:</h1>
-            <ul>
-                <li>GIVEN: {{this.availableStepDefinitions.GIVEN}}</li>
-                <li>WHEN: {{this.availableStepDefinitions.WHEN}}</li>
-                <li>THEN: {{this.availableStepDefinitions.THEN}}</li>
-            </ul>
+      <!-- Loading Screen -->
+      <template v-if="showLoadingScreen">
+          <LoadingScreen msg="Please wait..."></LoadingScreen>
+      </template>
 
-            <div style="text-align: center">
-                <div class="btn btn-primary mr-3" @click="initializeAppData()"> Reinit Application</div>
+      <!--Info Box-->
+      <template v-if="showInfoBox">
+          <InfoBox :msg="infoBox.msg" v-bind:closeable="infoBox.closable" :type="infoBox.type"></InfoBox>
+      </template>
 
-                <button class="btn btn-primary mr-3" @click="openModalDialog('Modal dialog', 'This is a modal dialog', false,true)" data-toggle="modal" data-target="#modalDialog" data-backdrop="static" data-keyboard="false">Open static modal</button>
-                <button class="btn btn-primary mr-3" @click="openModalDialog('Dialog', 'This is a closable dialog', true,false)"    data-toggle="modal" data-target="#modalDialog" data-backdrop="static" data-keyboard="false">Open closable dialog</button>
-                <div class="btn btn-primary mr-3" @click="openModalDialog('Dialog', 'This is a Dialog from DIV',false,true)"        data-toggle="modal" data-target="#modalDialog" data-backdrop="static" data-keyboard="false">Div-Buton</div>
+      <!--Modal dialog-->
+      <template v-if="createModal">
+          <Modal v-model="modalConfirmed"
+                 :title="modalTitle"
+                 :text="modalText"
+                 :closeable="modalClosable"
+                 :show-footer="showModalFooter">
+          </Modal>
+      </template>
+
+      <div style="text-align: center;">
+          <h1>AWATAR Creator</h1>
+          <p>Ein Tool zur Erstellung von automatisierten Tests nach Behavior Test Driven Approach mit AWATAR</p>
+      </div>
+
+      <div style="width: 50%; margin: 0 auto;">
+          <div v-if="applicationData">
+
+            <!-- Load test case -->
+            <template v-if="createLoadTestFeatureModal">
+                <load-test-feature v-model="loadedTestFeature"></load-test-feature>
+            </template>
+
+            <div>
+                    <create-test-feature v-model="testFeature" :step-definitions="availableStepDefinitions"></create-test-feature>
             </div>
-        </div>
-        <!-- ENDE SPIELWIESE -->
 
-        <!-- Loading Screen -->
-        <template v-if="showLoadingScreen">
-            <LoadingScreen msg="Please wait..."></LoadingScreen>
-        </template>
-
-        <!--Info Box-->
-        <template v-if="showInfoBox">
-            <InfoBox :msg="infoBox.msg" v-bind:closeable="infoBox.closable" :type="infoBox.type"></InfoBox>
-        </template>
-
-        <!--Modal dialog-->
-        <template v-if="createModal">
-            <Modal v-model="modalConfirmed"
-                   :title="modalTitle"
-                   :text="modalText"
-                   :closeable="modalClosable"
-                   :show-footer="showModalFooter">
-            </Modal>
-        </template>
-
-        <!-- Load test case -->
-        <template v-if="createLoadTestFeatureModal">
-            <load-test-feature v-model="loadedTestFeature"></load-test-feature>
-        </template>
-
-
-
-
-        <div style="text-align: center;">
-            <h1>AWATAR Creator</h1>
-            <p>Ein Tool zur Erstellung von automatisierten Tests nach Behavior Test Driven Approach mit AWATAR</p>
-        </div>
-
-
-        <div class="row">
-            <div style="width: 50%; margin: 0 auto;">
-                <create-test-feature v-model="testFeature" :step-definitions="availableStepDefinitions"></create-test-feature>
+            <div>
+                <div class="form-group">
+                    <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="saveAsFile()">Testfall speichern</a>
+                    <a class="btn btn-primary float-right mr-3" @click="showLoadTestFeature()"
+                       data-toggle="modal" data-target="#loadTestFeatureDialog" data-backdrop="static" data-keyboard="false">Testfall laden</a>
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="form-group" style="width: 50%; margin: 0 auto;">
-                <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="executeTest()">Test ausführen</a>
-                <a class="btn btn-primary float-right mr-3" :class="{'disabled' : ! validTestFeature}" @click="saveAsFile()">Testfall speichern</a>
-                <a class="btn btn-primary float-right mr-3" @click="showLoadTestFeature()"
-                   data-toggle="modal" data-target="#loadTestFeatureDialog" data-backdrop="static" data-keyboard="false">Testfall laden</a>
-            </div>
-        </div>
-
-
-        <!--Test execution log -->
-        <template v-if="showTestExecutionInfoBox">
-                <test-execution-result :type="infoBox.type" :result-log="infoBox.msg"></test-execution-result>
-        </template>
-
-    </div>
-    <div v-else>
-        <InfoBox v-if="noBackendAvailable" msg="AWATAR Backend Server not reachable" v-bind:closeable="false" type="error"></InfoBox>
-    </div>
+          </div>
+          <div v-else>
+              <InfoBox v-if="noBackendAvailable" msg="AWATAR Backend Server not reachable" v-bind:closeable="false" type="error"></InfoBox>
+          </div>
+      </div>
+  </div>
 </template>
 
 <style scoped>
@@ -95,12 +67,11 @@
     import Modal from "./Modal";
     import CreateTestFeature from "./CreateTestFeature";
     import LoadTestFeature from "./LoadTestFeature";
-    import TestExecutionResult from "./TestExecutionResult";
 
 
     export default {
         name: "AwatarCreator",
-        components: {TestExecutionResult, LoadTestFeature, CreateTestFeature, Modal, LoadingScreen, InfoBox},
+        components: {LoadTestFeature, CreateTestFeature, Modal, LoadingScreen, InfoBox},
         data() {
             return {
                 applicationData: null,
@@ -284,6 +255,7 @@
                 }.bind(this))
                 .catch(function (error) {
                     this.showLoadingScreen = false
+                    this.noBackendAvailable = true
                     if (error.response) {
                         const data = JSON.parse(error.response.data)
                         console.log(data.errorMsg)

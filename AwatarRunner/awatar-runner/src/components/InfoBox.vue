@@ -1,20 +1,22 @@
 <template>
-    <div style="margin-top: 50px ">
-        <h2>Testergebnisse:</h2>
-        <div class="row">
-            <div class="alert fade show row" :class="alertType" role="alert">
-                <textarea v-model="resultLog" style="width: 100%; min-width: 100%" rows="25"></textarea>
-            </div>
-        </div>
+    <div class="alert fade show" :class="alertType" role="alert">
+        {{msg}}
+        <template v-if="closeable">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </template>
     </div>
 </template>
 
 <script>
     export default {
-        name: "TestExecutionResult",
+        name: "InfoBox",
         props: {
             type: String,
-            resultLog: String,
+            msg: String,
+            closeable: Boolean,
+
         },
         computed: {
             alertType() {

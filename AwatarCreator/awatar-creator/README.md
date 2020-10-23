@@ -24,7 +24,7 @@ You can start the development server by executing:
 npm run serve
 ```
 The application requires a connection to 'AwatarCore'. Therefore configure a correct IP of Server in proxy property in file 'vue.config.js'
-Usually the Webapplication starts at URL ``http://localhost:8081/``. 
+Usually the Webapplication starts at URL ``http://localhost:4000/``. The application 'Awatar-Creator' uses port 4001. 
 
 ### Compiles and minifies for production
 ```

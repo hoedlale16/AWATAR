@@ -6,20 +6,20 @@
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
     export default {
-        //Enter locale Vue-App IP
-        contextPath: 'http://localhost:4001/awatar',
+        /* AWATAR RUNNER IP (8081)*/
+        contextPath: 'http://localhost:4002/awatar',
         webRequest: axios.create({
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Cache-Control': 'no-cache'
             },
+            timeout: 5000,
             // cache will be enabled by default
-            adapter: cacheAdapterEnhancer(axios.defaults.adapter, { enabledByDefault: false}),
-            timeout: 2000,
+            adapter: cacheAdapterEnhancer(axios.defaults.adapter, { enabledByDefault: false})
         }),
         postRequest: axios.create({
             headers: {},
-            timeout: 2000,
+            timeout: 5000
         }),
         postRequestFormEncode: axios.create({
             headers: {
@@ -29,8 +29,6 @@
             transformRequest: function (data) {
                 return qs.stringify(data);
             },
-            timeout: 2000,
-
         }),
         postRequestPDF: axios.create({
             headers: {'Access-Control-Allow-Origin': '*'},
