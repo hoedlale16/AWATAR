@@ -17,4 +17,10 @@ public class GivenDefinitions {
       WebDriver driver = new ChromeDriver();
       driver.get(url);
   }
+
+    @Given("Webserver is available")
+    public void webserver_is_available() {
+    }
+
+
 }

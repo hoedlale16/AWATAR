@@ -13,6 +13,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 public class WhenDefinitions {
 
     //private final WebDriver driver = new ChromeDriver();
+    @When("User opens website")
+    public void open_website() {
+
+    }
 
     @When("User with username {string} and password {string} log into")
     public void user_with_username_and_password_log_into(String username, String password) {
